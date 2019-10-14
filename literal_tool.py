@@ -186,9 +186,11 @@ def count_bias(input):
         print(f_words_buf)
     elif f_score == 0 and m_score == 0:
         print("According to our repository of gender-coded words, this sentence is bias-free!")
-while True:
-    user_input = input("Write your sentence here (leave blank and press ENTER if you want exit):\n")
-    count_bias(user_input)
-    if len(user_input) == 0:
-        break
-    print()
+
+if __name__ == '__main__':
+    while True:
+        user_input = input("Write your sentence here (leave blank and press ENTER if you want exit):\n")
+        count_bias(user_input)
+        if len(user_input) == 0:
+            break
+        print()
