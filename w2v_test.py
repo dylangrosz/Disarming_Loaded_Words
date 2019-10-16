@@ -16,8 +16,10 @@ male_list = ["he", "his", "man", "John", "himself", "son", "father", "guy", "boy
 
 feminine_coded_words_unstemmed = [
     "agree",
+    "nurse",
     "affectionate",
-    #"child",
+    "bossy",
+    "child",
     "cheer",
     "collaborative",
     "committed",
@@ -50,8 +52,9 @@ feminine_coded_words_unstemmed = [
     "polite",
     "quiet",
     "responsive",
+    "sassy",
     "sensitive",
-    #"submissive",
+    "submissive",
     "support",
     "sympathetic",
     "tender",
@@ -69,6 +72,7 @@ feminine_coded_words_unstemmed = [
 
 masculine_coded_words_unstemmed = [
     "active",
+    "doctor",
     "adventurous",
     "aggressive",
     "ambitious",
