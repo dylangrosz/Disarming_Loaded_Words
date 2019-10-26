@@ -10,9 +10,6 @@ import seaborn as sns
 
 def load_model(limit=1000000):
     return gensim.models.KeyedVectors.load_word2vec_format('GoogleNews-vectors-negative300.bin', binary=True, limit=1000000)
-#model = api.load('word2vec-google-news-300')
-
-model = load_model(limit=1000000)
 
 female_list = ["she", "her", "woman", "Mary", "herself", "daughter", "mother", "gal", "girl", "female"]
 male_list = ["he", "his", "man", "John", "himself", "son", "father", "guy", "boy", "male"]
@@ -223,7 +220,7 @@ def get_base_score(male_list, female_list):
         base_scores.append(absolute_gender_score(v_m, v_f, model, comp = 1)[1])
     return max(base_scores)
 
-def get_single_base_score(gender_list, isFemale=True):
+def get_single_base_score(gender_list, model, isFemale=True):
     scores = []
     for w in gender_list:
         scores.append(absolute_single_gender_score(w, model, comp=1)[1])
@@ -234,7 +231,7 @@ def get_single_base_score(gender_list, isFemale=True):
 def plot_single_bias(model, gender_list, coded_words_unstemmed,
                      isFemale=True, TOP_N = 25, comp = 1, fn_name="bias.png"):
     scores_rel = []
-    base_score = get_single_base_score(gender_list, isFemale=isFemale)
+    base_score = get_single_base_score(gender_list, model, isFemale=isFemale)
     for w in coded_words_unstemmed:
         if w in model:
             scores_rel.append((w,
@@ -273,6 +270,7 @@ def plot_pair_bias(model, female_list, male_list,
     plt.show()
 
 if __name__ == '__main__':
+    model = load_model(limit=1000000)
     g_d = build_gender_direction(model, comp=1)
     p1, p2 = "father", "doctor"
     n1 = "mother"
@@ -287,8 +285,8 @@ if __name__ == '__main__':
                                                                     relative_gender_score(word_m_bias, word_f_bias,
                                                                                           base_score, model,
                                                                                           comp=1)))
-    base_f_score = get_single_base_score(female_list, isFemale=True)
-    base_m_score = get_single_base_score(male_list, isFemale=False)
+    base_f_score = get_single_base_score(female_list, model, isFemale=True)
+    base_m_score = get_single_base_score(male_list, model, isFemale=False)
     print("Gender score of {} is {} \n Gender score of {} is {}".format(word_m_bias,
                                                                         relative_single_gender_score(word_m_bias,
                                                                                                      base_m_score,
