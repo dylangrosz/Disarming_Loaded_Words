@@ -8,8 +8,11 @@ from sklearn.preprocessing import normalize
 from literal_tool import feminine_coded_words, masculine_coded_words
 import seaborn as sns
 
-model = gensim.models.KeyedVectors.load_word2vec_format('GoogleNews-vectors-negative300.bin', binary=True, limit=1000000)
+def load_model(limit=1000000):
+    return gensim.models.KeyedVectors.load_word2vec_format('GoogleNews-vectors-negative300.bin', binary=True, limit=1000000)
 #model = api.load('word2vec-google-news-300')
+
+model = load_model(limit=1000000)
 
 female_list = ["she", "her", "woman", "Mary", "herself", "daughter", "mother", "gal", "girl", "female"]
 male_list = ["he", "his", "man", "John", "himself", "son", "father", "guy", "boy", "male"]
@@ -151,8 +154,8 @@ def build_single_gender_directions(model, comp = 1):
     pca_m, pca_f = PCA(n_components = comp), PCA(n_components = comp)
     pcs_m, pcs_f = pca_m.fit_transform(g_m).squeeze(), \
                    pca_f.fit_transform(g_f).squeeze()
-    print(pca_m.explained_variance_ratio_)
-    print(pca_f.explained_variance_ratio_)
+    # print(pca_m.explained_variance_ratio_)
+    # print(pca_f.explained_variance_ratio_)
     return pcs_m, pca_m.explained_variance_ratio_, \
            pcs_f, pca_f.explained_variance_ratio_
 
@@ -248,7 +251,8 @@ def plot_single_bias(model, gender_list, coded_words_unstemmed,
     bp.get_figure().savefig(fn_name)
     plt.show()
 
-def plot_pair_bias(model, female_list, male_list, feminine_coded_words_unstemmed, masculine_coded_words_unstemmed,
+def plot_pair_bias(model, female_list, male_list,
+                   feminine_coded_words_unstemmed, masculine_coded_words_unstemmed,
                    TOP_N=25, comp = 1, fn_name="pair_bias.png"):
     scores_rel = []
     base_score = get_base_score(male_list, female_list)
