@@ -132,7 +132,7 @@ def unit_vec(vec):
     return vec / (vec ** 2).sum() ** 0.5
 
 def build_gender_subspace(model):
-    gender_subspace = np.zeros((model.wv['news'].shape[0],0))
+    gender_subspace = np.zeros((model.wv['news'].shape[0], 0))
     for v_f, v_m in zip(female_list, male_list):
         diff = np.subtract(model.wv[v_m], model.wv[v_f])
         diff = np.expand_dims(diff, axis=1)
