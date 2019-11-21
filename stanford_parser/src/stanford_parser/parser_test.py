@@ -4,7 +4,7 @@ import unittest
 class TestCase(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        from stanford_parser.parser import Parser        
+        from stanford_parser_old.parser import Parser
         cls.parser = Parser()
     
     def testParse(self):

@@ -1,5 +1,5 @@
 import jpype
-from stanford_parser.standoff import TextStandoff
+from stanford_parser_old.standoff import TextStandoff
 
 class ParserError(Exception):
     def __init__(self, *args, **margs):

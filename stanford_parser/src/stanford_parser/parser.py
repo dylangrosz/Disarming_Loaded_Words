@@ -1,5 +1,5 @@
 import jpype
-from stanford_parser.standoff import TextStandoff
+from stanford_parser_old.standoff import TextStandoff
 
 
 class ParserError(Exception):
@@ -71,10 +71,9 @@ stanford_parser_home = None
 
 def startJvm():
     import os
-    os.environ.setdefault("STANFORD_PARSER_HOME", "C:/Users/dylan/PycharmProjects/disarming_loaded_words/stanford_parser2/3rdParty/stanford-parser/stanford-parser-2010-07-09")
+    os.environ.setdefault("STANFORD_PARSER_HOME", "C:/Users/dylan/PycharmProjects/disarming_loaded_words/stanford_parser/3rdParty/stanford-parser/stanford-parser-2010-07-09")
     global stanford_parser_home
     stanford_parser_home = os.environ["STANFORD_PARSER_HOME"]
-    print(stanford_parser_home)
     jpype.startJVM(jpype.getDefaultJVMPath(),
                    "-ea",
                    "-Djava.class.path=%s/stanford-parser.jar" % stanford_parser_home, )

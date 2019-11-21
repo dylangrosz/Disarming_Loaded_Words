@@ -3,7 +3,7 @@ import unittest
 
 class TestCase(unittest.TestCase):
     def testChildren(self):
-        import stanford_parser.dependencies as dependencies
+        import stanford_parser_old.dependencies as dependencies
         hierarchy = dependencies.StanfordDependencyHierarchy()
         self.assertEqual(hierarchy.isa("agent", "arg"), True)
 

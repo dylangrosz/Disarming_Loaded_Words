@@ -1,5 +1,5 @@
 import unittest
-from stanford_parser.standoff import TextStandoff
+from stanford_parser_old.standoff import TextStandoff
 
 class StandoffTestCase(unittest.TestCase):
     def testOverlaps(self):
