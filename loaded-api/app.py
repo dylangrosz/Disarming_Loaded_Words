@@ -6,7 +6,10 @@ from flask import make_response
 from flask import request
 from flask import url_for
 
-from '../run_model_on_article.py' import *
+#Import Dylan's model
+import sys
+sys.path.append("..")
+from run_model_on_article.py import *
 
 app = Flask(__name__)
 
@@ -27,8 +30,6 @@ def index():
 def call_with_hardcode():
 	hardcoded_string = "she had sexy cleavage and a shrill voice as she talked about domestic affairs"
 	return jsonify(apiget(hardcoded_string))
-
-
 
 #Old API below
 
