@@ -26,10 +26,16 @@ def index():
     return "The Loaded Words API is up and running! Let's make sure your words are not gender biased. :)"
 
 
-@app.route('api/v2.0/apiget', methods=['GET'])
+@app.route('/api/v2.0/apiget', methods=['GET'])
 def call_with_hardcode():
-	hardcoded_string = "she had sexy cleavage and a shrill voice as she talked about domestic affairs"
+	hardcoded_string = "{'body': 'she had sexy cleavage and a shrill voice as she talked about domestic affairs'}"
 	return jsonify(apiget(hardcoded_string))
+
+@app.route('/api/v2.0/post', methods=['POST'])
+def handle_post_request():
+	json = request.json #This works! A field called 'body' contains the entire text as a string
+	#return jsonify(json) --- this would print out the json payload
+	return jsonify(apiget(json)) # Not tested - would depend on functionality of the apiget function
 
 #Old API below
 
