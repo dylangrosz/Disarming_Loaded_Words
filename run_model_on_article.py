@@ -117,7 +117,8 @@ def call_load_model():
     print("fully loaded!")
     return model
 
-def apiget(article_string):
+def apiget(article_string, threshold):
+    print("running model with threshold: " + str(threshold))
     model = pickle.load(open("disarming_model.sav", "rb"))
     sentences, filtered_words = [], []
     data = article_string.replace('\n', ' ')
@@ -135,7 +136,7 @@ def apiget(article_string):
 
     print("getting words...") #printing this so that we can have some kind of feedback
     suspect_to_sentence, word_not_in_model = collect_suspect_words(model, filtered_words, sentences,
-                                                                   base_f_score, base_m_score, thresh=0.4)
+                                                                   base_f_score, base_m_score, thresh=threshold)
     print("done, returning...") #printing this so that we can have some kind of feedback
     cleaved_suspects = pos_cleave(suspect_to_sentence)
 

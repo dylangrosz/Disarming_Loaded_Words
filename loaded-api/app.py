@@ -20,6 +20,7 @@ female_words={
 "wife"
 }
 
+#MUST RUN THE ROUTE BEFORE RUNNING ANYTHING ELSE TO LOAD THE MODEL.
 @app.route('/')
 def index():
 	#Load the model
@@ -35,7 +36,7 @@ def call_with_hardcode():
 def handle_post_request():
 	json = request.json #This works! A field called 'body' contains the entire text as a string
 	#return jsonify(json) --- this would print out the json payload
-	return jsonify(run_model_on_article.apiget(json['body'])) # Not tested - would depend on functionality of the apiget function
+	return jsonify(run_model_on_article.apiget(json['body'], float(json['sensitivity']))) # Not tested - would depend on functionality of the apiget function
 
 #Old API below
 
