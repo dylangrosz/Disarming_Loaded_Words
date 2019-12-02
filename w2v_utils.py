@@ -3,10 +3,10 @@ import gensim.downloader as api
 import pprint as pp
 import numpy as np
 from sklearn.decomposition import PCA
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt  ----commented out due to Emily's lack of tkinter
 from sklearn.preprocessing import normalize
 from literal_tool import feminine_coded_words, masculine_coded_words
-import seaborn as sns
+#import seaborn as sns ----commented out due to Emily's lack of tkinter
 
 def load_model(limit=1000000):
     return gensim.models.KeyedVectors.load_word2vec_format('GoogleNews-vectors-negative300.bin', binary=True, limit=1000000)
@@ -239,14 +239,14 @@ def plot_single_bias(model, gender_list, coded_words_unstemmed,
     scores_rel.sort(reverse=(not isFemale), key=lambda x: x[1])
     w_concs = [w for w, s in scores_rel]
     scores_rel_s = [s for w, s in scores_rel]
-    plt.figure(figsize=(14, 7))
-    bp = sns.barplot(w_concs[:TOP_N], scores_rel_s[:TOP_N])
-    bp.set_xticklabels(bp.get_xticklabels(), rotation=45, ha='right')
+    #plt.figure(figsize=(14, 7))
+    #bp = sns.barplot(w_concs[:TOP_N], scores_rel_s[:TOP_N]) ---commenting out due to dependency
+    #bp.set_xticklabels(bp.get_xticklabels(), rotation=45, ha='right')
     ylabel_name = 'Projection Proximity to \'Femininity\'' if isFemale else 'Projection Proximity to \'Masculinity\''
-    bp.set(ylabel=ylabel_name, xlabel='Words')
-    plt.tight_layout()
-    bp.get_figure().savefig(fn_name)
-    plt.show()
+    #bp.set(ylabel=ylabel_name, xlabel='Words')
+    #plt.tight_layout()
+    #bp.get_figure().savefig(fn_name)
+    #plt.show()
 
 def plot_pair_bias(model, female_list, male_list,
                    feminine_coded_words_unstemmed, masculine_coded_words_unstemmed,
@@ -261,13 +261,13 @@ def plot_pair_bias(model, female_list, male_list,
     scores_rel.sort(reverse=True, key=lambda x: x[1])
     w_concs = [w for w, s in scores_rel]
     scores_rel_s = [s for w, s in scores_rel]
-    plt.figure(figsize=(14, 7))
-    bp = sns.barplot(w_concs[:TOP_N], scores_rel_s[:TOP_N])
-    bp.set_xticklabels(bp.get_xticklabels(), rotation=45, ha='right')
-    bp.set(ylabel='Projection Proximity to Gender Rift', xlabel='F vs. M Word Pairs')
-    plt.tight_layout()
-    bp.get_figure().savefig(fn_name)
-    plt.show()
+    #plt.figure(figsize=(14, 7))
+    #bp = sns.barplot(w_concs[:TOP_N], scores_rel_s[:TOP_N]) ---dependency
+    #bp.set_xticklabels(bp.get_xticklabels(), rotation=45, ha='right')
+    #bp.set(ylabel='Projection Proximity to Gender Rift', xlabel='F vs. M Word Pairs')
+    #plt.tight_layout()
+    #bp.get_figure().savefig(fn_name)
+    #plt.show()
 
 if __name__ == '__main__':
     model = load_model(limit=1000000)

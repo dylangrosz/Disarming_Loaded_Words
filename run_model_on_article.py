@@ -6,7 +6,7 @@ from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from nltk import pos_tag
 from nltk.tag import StanfordNERTagger
-import stanford_parser.src.stanford_parser.parser as nlpparser
+#import stanford_parser.src.stanford_parser.parser as nlpparser --dependency issue with java
 
 def parse_article(article_fn):
     sentences, filtered_words = [], []
@@ -73,27 +73,27 @@ def pos_score_adjust(word, sentence, bias_score):
 
 
 def pos_cleave(suspect_to_sentence):
-    parser = nlpparser.Parser()
+    #parser = nlpparser.Parser()
     suspect_to_sentence_cleaved = {}
     for k, score in suspect_to_sentence.items():
         suspect, gender_id, sentence = k
-        dependencies = parser.parseToStanfordDependencies(sentence)
-        dependency_list = [(rel, gov.text, dep.text) for rel, gov, dep in dependencies.dependencies]
-        print(suspect + ": " + str(pos_tag([suspect])))
-        print(sentence)
-        new_dependency_list = []
-        for dep in dependency_list:
-            pos, modder, modded = dep
-            if suspect == modder:
-                new_dependency_list.append(dep)
-                if pos == 'nsubj':
-                    base_score = base_f_score if gender_id == 'F' else base_m_score
-                    print(modded)
-#                    if relative_single_gender_score(modded, base_score, model) > 0.7:
-                    # TODO implement gender check, validate_modded_gender(modded, gender_id)
-                    suspect_to_sentence_cleaved[(suspect, gender_id, modded, sentence)] = score
-                # TODO take care of more complex cases
-        pprint(dependency_list)
+#         dependencies = parser.parseToStanfordDependencies(sentence)
+#         dependency_list = [(rel, gov.text, dep.text) for rel, gov, dep in dependencies.dependencies]
+#         print(suspect + ": " + str(pos_tag([suspect])))
+#         print(sentence)
+#         new_dependency_list = []
+#         for dep in dependency_list:
+#             pos, modder, modded = dep
+#             if suspect == modder:
+#                 new_dependency_list.append(dep)
+#                 if pos == 'nsubj':
+#                     base_score = base_f_score if gender_id == 'F' else base_m_score
+#                     print(modded)
+# #                    if relative_single_gender_score(modded, base_score, model) > 0.7:
+#                     # TODO implement gender check, validate_modded_gender(modded, gender_id)
+#                     suspect_to_sentence_cleaved[(suspect, gender_id, modded, sentence)] = score
+#                 # TODO take care of more complex cases
+#         pprint(dependency_list)
     return suspect_to_sentence_cleaved
 
 if __name__ == '__main__':

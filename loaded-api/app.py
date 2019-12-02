@@ -9,7 +9,7 @@ from flask import url_for
 #Import Dylan's model
 import sys
 sys.path.append("..")
-from run_model_on_article.py import *
+import run_model_on_article
 
 app = Flask(__name__)
 
@@ -35,7 +35,7 @@ def call_with_hardcode():
 def handle_post_request():
 	json = request.json #This works! A field called 'body' contains the entire text as a string
 	#return jsonify(json) --- this would print out the json payload
-	return jsonify(apiget(json)) # Not tested - would depend on functionality of the apiget function
+	return jsonify(run_model_on_article.apiget(json)) # Not tested - would depend on functionality of the apiget function
 
 #Old API below
 
