@@ -9,7 +9,7 @@ from literal_tool import feminine_coded_words, masculine_coded_words
 #import seaborn as sns ----commented out due to Emily's lack of tkinter
 
 def load_model(limit=1000000):
-    return gensim.models.KeyedVectors.load_word2vec_format('GoogleNews-vectors-negative300.bin', binary=True, limit=1000000)
+    return gensim.models.KeyedVectors.load_word2vec_format('~/Desktop/Disarming_Loaded_Words/GoogleNews-vectors-negative300.bin', binary=True, limit=limit)
 
 female_list = ["she", "her", "woman", "Mary", "herself", "daughter", "mother", "gal", "girl", "female"]
 male_list = ["he", "his", "man", "John", "himself", "son", "father", "guy", "boy", "male"]

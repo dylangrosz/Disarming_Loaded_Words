@@ -6,6 +6,7 @@ from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from nltk import pos_tag
 from nltk.tag import StanfordNERTagger
+import pickle
 #import stanford_parser.src.stanford_parser.parser as nlpparser --dependency issue with java
 
 def parse_article(article_fn):
@@ -19,7 +20,7 @@ def parse_article(article_fn):
         filtered_words.extend([w for w in word_tokens if not w in stop_words])
     return filtered_words, sentences
 
-def collect_suspect_words(corpus, sentences, base_f_score, base_m_score, thresh = 0.5):
+def collect_suspect_words(model, corpus, sentences, base_f_score, base_m_score, thresh = 0.5):
     fem_bias_words, masc_bias_words = {}, {}
     suspect_to_sentence = {}
     word_not_in_model = []
@@ -35,10 +36,20 @@ def collect_suspect_words(corpus, sentences, base_f_score, base_m_score, thresh 
             isFemale = abs(fem_bias_adj) >= male_bias_adj
             if isFemale and abs(fem_bias_adj) >= thresh:
                 fem_bias_words[w] = fem_bias_adj
-                suspect_to_sentence[(w, 'F', sentences[sentence_cnt])] = abs(fem_bias_adj)
+                suspect_to_sentence[w + sentences[sentence_cnt]] = {
+                                                                        'word': w,
+                                                                        'score': abs(fem_bias_adj),
+                                                                        'gender': 'F',
+                                                                        'sentence': sentences[sentence_cnt]
+                                                                    }
             elif not isFemale and abs(male_bias_adj) >= thresh:
                 masc_bias_words[w] = male_bias_adj
-                suspect_to_sentence[(w, 'M', sentences[sentence_cnt])] = male_bias_adj
+                suspect_to_sentence[w + sentences[sentence_cnt]] = {
+                                                                        'word': w,
+                                                                        'score': abs(male_bias_adj),
+                                                                        'gender': 'M',
+                                                                        'sentence': sentences[sentence_cnt]
+                                                                    }
         elif len(w) == 1 and w in '.?!':
             sentence_cnt += 1
         else:
@@ -66,17 +77,19 @@ def pos_score_adjust(word, sentence, bias_score):
         "WDT": 0,
         "WP": 0,
         "WRB": 0,
-        "TO": 0
+        "TO": 0,
+        "CD": 0,
+        "LS": 0
     }
-    print(fetch_pos(word, sentence))
+    # print(fetch_pos(word, sentence))
     return bias_score * pos_deweights.get(fetch_pos(word, sentence), 1)
 
 
 def pos_cleave(suspect_to_sentence):
     #parser = nlpparser.Parser()
     suspect_to_sentence_cleaved = {}
-    for k, score in suspect_to_sentence.items():
-        suspect, gender_id, sentence = k
+    # for k, score in suspect_to_sentence.items():
+    #     suspect, gender_id, sentence = k
 #         dependencies = parser.parseToStanfordDependencies(sentence)
 #         dependency_list = [(rel, gov.text, dep.text) for rel, gov, dep in dependencies.dependencies]
 #         print(suspect + ": " + str(pos_tag([suspect])))
@@ -94,7 +107,39 @@ def pos_cleave(suspect_to_sentence):
 #                     suspect_to_sentence_cleaved[(suspect, gender_id, modded, sentence)] = score
 #                 # TODO take care of more complex cases
 #         pprint(dependency_list)
+    suspect_to_sentence_cleaved = suspect_to_sentence # TODO comment out
     return suspect_to_sentence_cleaved
+
+def call_load_model():
+    print("loading model....") #printing this so that we can have some kind of feedback
+    filename = "disarming_model.sav"
+    model = pickle.dump(load_model(limit=500000), open(filename, "wb"))
+    print("fully loaded!")
+    return model
+
+def apiget(article_string):
+    model = pickle.load(open("disarming_model.sav", "rb"))
+    sentences, filtered_words = [], []
+    data = article_string.replace('\n', ' ')
+    tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
+    print("filtering sentences...") #printing this so that we can have some kind of feedback
+    sentences.extend(tokenizer.tokenize(data))
+    stop_words = set(stopwords.words('english'))
+    word_tokens = word_tokenize(data)
+    print("filtering words...") #printing this so that we can have some kind of feedback
+    filtered_words.extend([w for w in word_tokens if not w in stop_words])
+
+    print("getting scores...") #printing this so that we can have some kind of feedback
+    base_f_score = get_single_base_score(female_list, model, isFemale=True)
+    base_m_score = get_single_base_score(male_list, model, isFemale=False)
+
+    print("getting words...") #printing this so that we can have some kind of feedback
+    suspect_to_sentence, word_not_in_model = collect_suspect_words(model, filtered_words, sentences,
+                                                                   base_f_score, base_m_score, thresh=0.4)
+    print("done, returning...") #printing this so that we can have some kind of feedback
+    cleaved_suspects = pos_cleave(suspect_to_sentence)
+
+    return cleaved_suspects
 
 if __name__ == '__main__':
     article_fn = sys.argv[1]
@@ -127,7 +172,7 @@ if __name__ == '__main__':
     filtered_words, sentences = parse_article(article_fn)
     print(filtered_words)
     suspect_to_sentence, word_not_in_model = collect_suspect_words(filtered_words, sentences,
-                                                                base_f_score, base_m_score, thresh=0)
+                                                                base_f_score, base_m_score, thresh=0.4)
     pprint(suspect_to_sentence)
     cleaved_suspects = pos_cleave(suspect_to_sentence)
     pprint(cleaved_suspects)
