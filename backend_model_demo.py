@@ -2,131 +2,15 @@ import gensim
 import gensim.downloader as api
 import pprint as pp
 import numpy as np
+import sys
 from sklearn.decomposition import PCA
-#import matplotlib.pyplot as plt  ----commented out due to Emily's lack of tkinter
+import matplotlib.pyplot as plt
 from sklearn.preprocessing import normalize
 from literal_tool import feminine_coded_words, masculine_coded_words
-#import seaborn as sns ----commented out due to Emily's lack of tkinter
-
+import seaborn as sns
+ 
 def load_model(limit=1000000):
-    return gensim.models.KeyedVectors.load_word2vec_format('~/Desktop/Disarming_Loaded_Words/GoogleNews-vectors-negative300.bin', binary=True, limit=limit)
-
-female_list = ["she", "her", "woman", "Mary", "herself", "daughter", "mother", "gal", "girl", "female"]
-male_list = ["he", "his", "man", "John", "himself", "son", "father", "guy", "boy", "male"]
-
-feminine_coded_words_unstemmed = [
-    "agree",
-    "nurse",
-    "affectionate",
-    "bossy",
-    "child",
-    "green",
-    "electrical",
-    "cheer",
-    "collaborative",
-    "committed",
-    "communal",
-    "compassionate",
-    "connected",
-    "considerate",
-    "cooperative",
-    "co-operative",
-    "dependable",
-    "emotional",
-    "empathetic",
-    "feel",
-    "flatterable",
-    "gentle",
-    "honest",
-    "interpersonal",
-    "interdependent",
-    "interpersonal",
-    "inter-personal",
-    "inter-dependent",
-    "inter-personal",
-    "kind",
-    "kinship",
-    "loyal",
-    "modesty",
-    "nag",
-    "nurturing",
-    "pleasant",
-    "polite",
-    "quiet",
-    "responsive",
-    "sassy",
-    "sensitive",
-    "submissive",
-    "support",
-    "sympathetic",
-    "tender",
-    "together",
-    "trusting",
-    "understand",
-    "warm",
-    "whiny",
-    "enthusiastic",
-    "inclusive",
-    "yield",
-    "share",
-    "sharing"
-]
-
-masculine_coded_words_unstemmed = [
-    "active",
-    "doctor",
-    "adventurous",
-    "aggressive",
-    "ambitious",
-    "analytical",
-    "assertive",
-    "athletic",
-    "autonomous",
-    "battle",
-    "boasting",
-    "challenging",
-    "champion",
-    "competitive",
-    "confident",
-    "courageous",
-    "decide",
-    "decision",
-    "decisive",
-    "defend",
-    "determined",
-    "dominant",
-    "driven",
-    "fearless",
-    "fight",
-    "force",
-    "greedy",
-    "head-strong",
-    "headstrong",
-    "hierarchy",
-    "hostile",
-    "impulsive",
-    "independent",
-    "individualistic",
-    "intellectual",
-    "lead",
-    "logical",
-    "objective",
-    "opinion",
-    "outspoken",
-    "persistent",
-    "principle",
-    "reckless",
-    "self-confident",
-    "self-reliant",
-    "self-sufficient",
-    "selfconfident",
-    "selfreliant",
-    "selfsufficient",
-    "stubborn",
-    "superior",
-    "unreasonable"
-]
-
+    return gensim.models.KeyedVectors.load_word2vec_format('GoogleNews-vectors-negative300.bin', binary=True, limit=limit)
 
 def unit_vec(vec):
     return vec / (vec ** 2).sum() ** 0.5
@@ -210,6 +94,7 @@ def absolute_single_gender_score(word, model, delta = 1, comp = 1):
         return (gp_m, gp_factor_m) if gp_factor_m > gp_factor_f else (gp_f, -1 * gp_factor_f)
     else:
         return 0 # are not semantically similar relative to delta
+
 def relative_single_gender_score(word, base_score, model, delta = 1, comp = 1):
     _, score = absolute_single_gender_score(word, model, delta = delta, comp = comp)
     return score / base_score if score > 0 else -1 * (score / base_score)
@@ -239,14 +124,14 @@ def plot_single_bias(model, gender_list, coded_words_unstemmed,
     scores_rel.sort(reverse=(not isFemale), key=lambda x: x[1])
     w_concs = [w for w, s in scores_rel]
     scores_rel_s = [s for w, s in scores_rel]
-    #plt.figure(figsize=(14, 7))
-    #bp = sns.barplot(w_concs[:TOP_N], scores_rel_s[:TOP_N]) ---commenting out due to dependency
-    #bp.set_xticklabels(bp.get_xticklabels(), rotation=45, ha='right')
+    plt.figure(figsize=(14, 7))
+    bp = sns.barplot(w_concs[:TOP_N], scores_rel_s[:TOP_N])
+    bp.set_xticklabels(bp.get_xticklabels(), rotation=45, ha='right')
     ylabel_name = 'Projection Proximity to \'Femininity\'' if isFemale else 'Projection Proximity to \'Masculinity\''
-    #bp.set(ylabel=ylabel_name, xlabel='Words')
-    #plt.tight_layout()
-    #bp.get_figure().savefig(fn_name)
-    #plt.show()
+    bp.set(ylabel=ylabel_name, xlabel='Words')
+    plt.tight_layout()
+    bp.get_figure().savefig(fn_name)
+    plt.show()
 
 def plot_pair_bias(model, female_list, male_list,
                    feminine_coded_words_unstemmed, masculine_coded_words_unstemmed,
@@ -269,36 +154,38 @@ def plot_pair_bias(model, female_list, male_list,
     #bp.get_figure().savefig(fn_name)
     #plt.show()
 
-if __name__ == '__main__':
-    model = load_model(limit=1000000)
-    g_d = build_gender_direction(model, comp=1)
-    p1, p2 = "father", "doctor"
-    n1 = "mother"
-    print("{} is to {} as {} is to: ".format(p1, p2, n1))
-    # pp.pprint(model.most_similar(positive=[p1, n1], negative=[p2]))
-    base_score = get_base_score(male_list, female_list)
 
-    word_m_bias, word_f_bias = "doctor", "nurse"
-    score = absolute_gender_score(word_m_bias, word_f_bias, model, comp=1)[1]
-    print("Relative gender score of {} vs. {}: {} / {} = {}".format(word_m_bias, word_f_bias,
-                                                                    score, base_score,
-                                                                    relative_gender_score(word_m_bias, word_f_bias,
-                                                                                          base_score, model,
-                                                                                          comp=1)))
+# Used to construct gender directions / subspaces
+female_list = ["she", "her", "woman", "Mary", "herself", "daughter", "mother", "gal", "girl", "female"]
+male_list = ["he", "his", "man", "John", "himself", "son", "father", "guy", "boy", "male"]
+
+def pos_score_adjust(word, sentence, bias_score):
+    noun_weight = 0.6
+    pos_deweights = {
+        "NN": noun_weight,
+        "NNP": noun_weight,
+        "NNS": noun_weight,
+        "PRP": 0,
+        "PRP$": 0,
+        "WDT": 0,
+        "WP": 0,
+        "WRB": 0,
+        "TO": 0
+    }
+    return bias_score * pos_deweights.get(fetch_pos(word, sentence), 1)
+
+
+if __name__ == '__main__':
+    feminine_coded_words_unstemmed = sys.argv[1:]
+    print("Scoring the following words based on female gender-bias score: " + str(feminine_coded_words_unstemmed))
+    print("building model...")
+    model = load_model(limit=500000)
+    print("building gender direction...")
+    g_d = build_gender_direction(model, comp=1)
+
     base_f_score = get_single_base_score(female_list, model, isFemale=True)
     base_m_score = get_single_base_score(male_list, model, isFemale=False)
-    print("Gender score of {} is {} \n Gender score of {} is {}".format(word_m_bias,
-                                                                        relative_single_gender_score(word_m_bias,
-                                                                                                     base_m_score,
-                                                                                                     model, comp=1),
-                                                                        word_f_bias,
-                                                                        relative_single_gender_score(word_f_bias,
-                                                                                                     base_f_score,
-                                                                                                     model,
-                                                                                                     comp=1)))
 
-    # feminine_coded_words_unstemmed = ["prance", "retreat", "shy", "shriek", "pout", "embrace", "nag", "whine","snap"]
-    # masculine_coded_words_unstemmed = ["force", "pound", "stand", "hammer", "boom", "shout", "shoot"]
-    plot_pair_bias(model, female_list, male_list, feminine_coded_words_unstemmed, masculine_coded_words_unstemmed)
-    plot_single_bias(model, female_list, feminine_coded_words_unstemmed, fn_name='feminine_bias.png', isFemale=True)
-    plot_single_bias(model, male_list, masculine_coded_words_unstemmed, fn_name="masculine_bias.png", isFemale=False)
+    print("Visualization being produced at: feminine_bias_demo.png")
+    plot_single_bias(model, female_list, feminine_coded_words_unstemmed, fn_name='feminine_bias_demo.png', isFemale=True)
+
